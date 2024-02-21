@@ -1,0 +1,8 @@
+pandas
+numpy
+tensorflow
+tensorflow_hub
+opencv-python
+opencv-contrib-python
+matplotlib
+mediapipe
