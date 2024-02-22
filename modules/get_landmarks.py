@@ -59,6 +59,7 @@ def __display(image, results, time_show):
         pass
 
 
+
 def getLandmarks(image: np.array, show_landmarks=True, time_show=5):
     """
     Take `image` as image input and return x, y coordinate array of 543 landmarks.
@@ -66,7 +67,6 @@ def getLandmarks(image: np.array, show_landmarks=True, time_show=5):
     x_list = []
     y_list = []
 
-    image = cv2.resize(image, (800, 600))
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     # Making predictions using holistic model
