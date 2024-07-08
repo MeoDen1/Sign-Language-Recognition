@@ -1,0 +1,5 @@
+1. Annotation of each video:
+    - name: video directory: 'train/video_name'
+    - signer:
+    - gloss:
+    - text:
