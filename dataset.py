@@ -15,7 +15,7 @@ class Dataset:
             # - text: ...
             self.annotations = pickle.load(f)
 
-    def load(self, path="Dataset/videos_phoenix/videos", size: int=10, pre_processing=None) -> list:
+    def load(self, path="Dataset/videos_phoenix/videos", size: int=10, pre_processing=None, seq_len=100) -> list:
         """
         Return format: List of object: {cap, gloss, text}
         """
@@ -46,9 +46,25 @@ class Dataset:
 
             # Apply pre_processing function
             if pre_processing:
-                frames = pre_processing(frames)
+                frames = pre_processing(frames, seq_len)
             
             count += 1
             data.append({'path': vid_path, 'frames': frames, 'gloss': obj["gloss"], "text": obj["text"]})
 
         return data
+    
+def pre_processing_1(frames: np.array, seq_len: int):
+    """
+    Gray scale the frames and padding the frames to `seq_len`
+    `input`: shape (len, height, width, channels)
+    """
+    output = []
+    for i, frame in enumerate(frames):
+        if (i == seq_len): 
+            break
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        output.append(np.expand_dims(frame, axis=-1))
+
+    output += [np.zeros_like(output[0]) for _ in range(seq_len - len(output))]
+
+    return np.array(output) / 255

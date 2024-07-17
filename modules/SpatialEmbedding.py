@@ -13,7 +13,7 @@ class SpatialEmbedding(layers.Layer):
         self.conv_2d_1 = layers.Conv2D(16, 3, activation='relu')
         self.max_pooling_1 = layers.MaxPooling2D()
         self.conv_2d_2 = layers.Conv2D(32, 3, activation='relu')
-        self.dense_1 = layers.Dense(embedding_dim)
+        self.W_1 = layers.Dense(embedding_dim)
         self.flatten = layers.Flatten()
 
         # position encoding
@@ -30,22 +30,22 @@ class SpatialEmbedding(layers.Layer):
         
         return P
 
-    def call(self, inputs):
+    def call(self, x):
         """
-        `input`: shape (batch_size, seq_len, height, width, channels)
+        `x`: shape (batch_size, seq_len, height, width, channels)
         - output with shape (batch_size, seq_len, embedding_dim)
         """
-        # input: (batch_size, seq_len, height, width, channels)
+        # x: (batch_size, seq_len, height, width, channels)
         processed_frames = []
 
         for i in range(self.seq_len):
-            frame = inputs[:, i, :, :]
-            x = self.conv_2d_1(frame)
-            x = self.max_pooling_1(x)
-            x = self.conv_2d_2(x)
-            x = self.flatten(x)
-            x = self.dense_1(x)
-            processed_frames.append(x)
+            frame = x[:, i, :, :, :]
+            x1 = self.conv_2d_1(frame)
+            x1 = self.max_pooling_1(x1)
+            x1 = self.conv_2d_2(x1)
+            x1 = self.flatten(x1)
+            x1 = self.W_1(x1)
+            processed_frames.append(x1)
 
         output = tf.stack(processed_frames, axis=1)
         output += self.positional_encoding

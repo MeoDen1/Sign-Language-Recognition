@@ -1,4 +1,4 @@
-from modules.dataset import Dataset
+from dataset import Dataset
 from holistic_landmark import HolisticModel
 import cv2
 

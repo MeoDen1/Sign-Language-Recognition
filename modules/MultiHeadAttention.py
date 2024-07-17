@@ -7,7 +7,7 @@ class DotProductAttention(layers.Layer):
         super().__init__(**kwargs)
 
     def call(self, queries, keys, values, d_k, mask=None):
-        scores = tf.matmul(queries, keys, transpose_b=True) / tf.sqrt(d_k)
+        scores = tf.matmul(queries, keys, transpose_b=True) / np.sqrt(d_k)
 
         if mask is not None:
             scores += -1e9 * mask
@@ -17,7 +17,7 @@ class DotProductAttention(layers.Layer):
         return tf.matmul(weights, values)
     
 
-class MultiHeadAttention():
+class MultiHeadAttention(layers.Layer):
     def __init__(self, heads, d_k, d_v, d_model, **kwargs):
         super().__init__(**kwargs)
         self.heads = heads
@@ -49,7 +49,7 @@ class MultiHeadAttention():
         values = self.reshape_tensor(values, self.heads, True)
         # Output shape: (batch_size, heads, seq_len, -1)
 
-        output = self.attention(queries, keys, values, self.d_k, mask)
+        output = self.attention(queries, keys, values, d_k=self.d_k, mask=mask)
         # Output shape: (batch_size, heads, seq_len, -1)
 
         # Concat output heads

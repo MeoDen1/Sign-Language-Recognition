@@ -7,16 +7,17 @@ class AddNormalization(layers.Layer):
         super().__init__(**kwargs)
         self.layer_norm = layers.LayerNormalization()
 
-    def call(self, input_1, input_2):
-        return self.layer_norm(input_1 +input_2)
+    def call(self, x_1, x_2):
+        return self.layer_norm(x_1 + x_2)
     
 
 class FeedForward(layers.Layer):
     def __init__(self, d_ff, d_model, **kwargs):
+        super().__init__(**kwargs)
         self.W_1 = layers.Dense(d_ff, activation='relu')
         self.W_2 = layers.Dense(d_model)
 
-    def call(self, input):
-        x = self.W_1(input)
+    def call(self, x):
+        x = self.W_1(x)
 
         return self.W_2(x)

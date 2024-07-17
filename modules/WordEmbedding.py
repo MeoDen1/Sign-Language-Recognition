@@ -21,12 +21,12 @@ class WordEmbedding(layers.Layer):
         
         return P
     
-    def call(self, input):
+    def call(self, x):
         """
-        `input`: list of token (batch_size, seq_len)
+        `x`: list of token (batch_size, seq_len)
         - output with shape: (batch_size, seq_len, embedding_dim)
         """
-        x = self.embedding(input)
+        x = self.embedding(x)
         x += self.positional_encoding
 
         return x
