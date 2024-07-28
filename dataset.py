@@ -4,6 +4,8 @@ import gzip
 import random
 import os
 import cv2
+from keras_preprocessing.sequence import pad_sequences
+from keras_preprocessing.text import Tokenizer
 
 class Dataset:
     def __init__(self) -> None:
@@ -15,7 +17,7 @@ class Dataset:
             # - text: ...
             self.annotations = pickle.load(f)
 
-    def load(self, path="Dataset/videos_phoenix/videos", size: int=10, pre_processing=None, seq_len=100) -> list:
+    def load(self, path="Dataset/videos_phoenix/videos", size: int=10) -> list:
         """
         Return format: List of object: {cap, gloss, text}
         """
@@ -25,7 +27,7 @@ class Dataset:
         data = []
 
         for obj in self.annotations:
-            if count > size:
+            if count >= size:
                 break
         
             vid_path = os.path.join(path, obj["name"]) + ".mp4"
@@ -44,16 +46,12 @@ class Dataset:
 
             frames = np.array(frames)
 
-            # Apply pre_processing function
-            if pre_processing:
-                frames = pre_processing(frames, seq_len)
-            
             count += 1
             data.append({'path': vid_path, 'frames': frames, 'gloss': obj["gloss"], "text": obj["text"]})
 
         return data
     
-def pre_processing_1(frames: np.array, seq_len: int):
+def frame_processing(frames: np.array, seq_len: int):
     """
     Gray scale the frames and padding the frames to `seq_len`
     `input`: shape (len, height, width, channels)
@@ -68,3 +66,57 @@ def pre_processing_1(frames: np.array, seq_len: int):
     output += [np.zeros_like(output[0]) for _ in range(seq_len - len(output))]
 
     return np.array(output) / 255
+
+
+def pre_processing_1(data, encoder_seq_len: int, decoder_seq_len: int):
+    """
+    Pre-processing the data
+
+    Parameters
+    --
+    data: dict
+        {'path', 'frames', 'gloss', 'text'}
+    encoder_seq_len: int
+        Max encoder sequence length
+    decoder_seq_len: int
+        Max decoder sequence length
+
+    Returns
+    --
+    tokenizer: Tokenizer
+        tokenizer to convert texts into sequence
+    frames_data: ndarray
+        sequence of videos with shape (size, encoder_seq_len, height, width, 1)
+    gloss_data: ndarray
+        sequence of token with shape (size, decoder_seq_len)
+    text_data: ndarray
+        empty
+
+    """
+    frames_data = []
+    gloss_data = []
+    text_data = []
+
+    for obj in data:
+        # Pre-processing frame
+        frames_data.append(frame_processing(obj['frames'], encoder_seq_len))
+
+        gloss_data.append('SOS ' + obj['gloss'] + ' EOS')
+        text_data.append('SOS ' + obj['text'] + ' EOS')
+
+    # Tokenize gloss
+    tokenizer = Tokenizer()
+    # Update vocabulary
+    tokenizer.fit_on_texts(gloss_data)
+    # Convert gloss data into sequence of int
+    gloss_data = tokenizer.texts_to_sequences(gloss_data)
+    # Padding sequence
+    gloss_data = pad_sequences(gloss_data, maxlen=decoder_seq_len, padding='post')
+
+    tokenizer.word_index['PAD'] = 0
+    tokenizer.index_word[0] = 'PAD'
+
+    # Tokenize text
+    # ...
+
+    return tokenizer, np.array(frames_data), np.array(gloss_data), np.array(text_data)

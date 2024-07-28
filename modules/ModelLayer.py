@@ -12,6 +12,9 @@ class AddNormalization(layers.Layer):
     
 
 class FeedForward(layers.Layer):
+    """
+    Feed forward layer with 2 connected NN layers
+    """
     def __init__(self, d_ff, d_model, **kwargs):
         super().__init__(**kwargs)
         self.W_1 = layers.Dense(d_ff, activation='relu')

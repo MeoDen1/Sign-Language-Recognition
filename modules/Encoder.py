@@ -16,11 +16,11 @@ class EncoderLayer(layers.Layer):
         self.dropout_2 = layers.Dropout(rate)
         self.add_norm_2 = AddNormalization()
 
-    def call(self, input, padding_mask, training):
-        multihead_output = self.multi_head_attention(input, input, input, mask=padding_mask)
+    def call(self, x, padding_mask, training):
+        multihead_output = self.multi_head_attention(x, x, x, mask=padding_mask)
         # Output shape: (batch_size, seq_len, d_model)
         multihead_output = self.dropout_1(multihead_output, training=training)
-        multihead_output = self.add_norm_1(input, multihead_output)
+        multihead_output = self.add_norm_1(x, multihead_output)
 
         feed_forward_output = self.feed_forward(multihead_output)
         feed_forward_output = self.dropout_2(feed_forward_output, training=training)
@@ -29,8 +29,11 @@ class EncoderLayer(layers.Layer):
 
         return feed_forward_output
 
+# Possible error:
+# Only input tensors may be passed as positional arguments.
+# The following argument value should be passed as a keyword argument
 class Encoder(layers.Layer):
-    def __init__(self, heads, seq_len, d_k, d_v, d_ff, d_model, rate, N=6, **kwargs):
+    def __init__(self, seq_len, heads, d_k, d_v, d_ff, d_model, rate, N=6, **kwargs):
         super().__init__(**kwargs)
         self.spatial_embedding = SpatialEmbedding(seq_len, d_model)
         self.encoder_layers = [EncoderLayer(heads, d_k, d_v, d_ff, d_model, rate) for _ in range(N)]

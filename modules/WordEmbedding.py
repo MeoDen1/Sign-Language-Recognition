@@ -5,6 +5,15 @@ from keras import layers
 class WordEmbedding(layers.Layer):
     """
     Convert sequence of tokens into sequence of vector
+
+    Parameters
+    --
+    x : array_like
+        List of token. Shape : (batch_size, seq_len)
+
+    Return
+    --
+    output : shape (batch_size, seq_len, embedding_dim)
     """
     def __init__(self, seq_len, vocab_size, embedding_dim, **kwargs):
         super().__init__(**kwargs)
@@ -22,10 +31,6 @@ class WordEmbedding(layers.Layer):
         return P
     
     def call(self, x):
-        """
-        `x`: list of token (batch_size, seq_len)
-        - output with shape: (batch_size, seq_len, embedding_dim)
-        """
         x = self.embedding(x)
         x += self.positional_encoding
 
