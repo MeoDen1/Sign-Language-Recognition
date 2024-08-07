@@ -14,23 +14,24 @@ class HolisticModel:
         `image`: input image
         `result`: image's landmarks
         """
-        self.mp_drawing.draw_landmarks(
-            image,
-            results.face_landmarks,
-            self.mp_holistic.FACEMESH_CONTOURS,
+        # # Draw face landmarks
+        # self.mp_drawing.draw_landmarks(
+        #     image,
+        #     results.face_landmarks,
+        #     self.mp_holistic.FACEMESH_CONTOURS,
 
-            self.mp_drawing.DrawingSpec(
-                color=(255,0,255),
-                thickness=1,
-                circle_radius=1
-            ),
+        #     self.mp_drawing.DrawingSpec(
+        #         color=(255,0,255),
+        #         thickness=1,
+        #         circle_radius=1
+        #     ),
 
-            self.mp_drawing.DrawingSpec(
-                color=(0,255,255),
-                thickness=1,
-                circle_radius=1
-            )
-        )
+        #     self.mp_drawing.DrawingSpec(
+        #         color=(0,255,255),
+        #         thickness=1,
+        #         circle_radius=1
+        #     )
+        # )
 
         # Drawing Right hand Landmarks
         self.mp_drawing.draw_landmarks(
@@ -58,10 +59,10 @@ class HolisticModel:
         
     def get_landmarks(self, image: np.array):
         """
-        Get full x and y of 543 landmarks of image:
+        Get full x and y of 75 landmarks of image:
         `image`: input image \n
         Return: 
-        `features`: an numpy array with shape (543 * 2, )
+        `features`: an numpy array with shape (75 * 2, )
         `image`: processed image
 
         """
@@ -78,32 +79,18 @@ class HolisticModel:
         #
         # Extract point
         #
-        # Extract face
-        if results.face_landmarks:
-            for idx, landmark in enumerate(results.face_landmarks.landmark):
-                x = float(landmark.x)
-                y = float(landmark.y)
+        # # Extract face
+        # if results.face_landmarks:
+        #     for idx, landmark in enumerate(results.face_landmarks.landmark):
+        #         x = float(landmark.x)
+        #         y = float(landmark.y)
 
-                x_list.append(x)
-                y_list.append(y)
+        #         x_list.append(x)
+        #         y_list.append(y)
 
-        else:
-            x_list.append(0 for i in range(468))
-            y_list.append(0 for i in range(468))
-
-
-        if results.left_hand_landmarks:
-            for idx, landmark in enumerate(results.left_hand_landmarks.landmark):
-                x = float(landmark.x)
-                y = float(landmark.y)
-
-                x_list.append(x)
-                y_list.append(y)
-
-        else:
-            x_list.append(0 for i in range(21))
-            y_list.append(0 for i in range(21))
-
+        # else:
+        #     x_list += [0 for i in range(468)]
+        #     y_list += [0 for i in range(468)]
 
         if results.pose_landmarks:
             for idx, landmark in enumerate(results.pose_landmarks.landmark):
@@ -114,8 +101,20 @@ class HolisticModel:
                 y_list.append(y)
 
         else:
-            x_list.append(0 for i in range(33))
-            y_list.append(0 for i in range(33))    
+            x_list += [0 for i in range(33)]
+            y_list += [0 for i in range(33)]   
+
+        if results.left_hand_landmarks:
+            for idx, landmark in enumerate(results.left_hand_landmarks.landmark):
+                x = float(landmark.x)
+                y = float(landmark.y)
+
+                x_list.append(x)
+                y_list.append(y)
+
+        else:
+            x_list += [0 for i in range(21)]
+            y_list += [0 for i in range(21)]
 
 
         if results.right_hand_landmarks:
@@ -127,8 +126,8 @@ class HolisticModel:
                 y_list.append(y)
 
         else:
-            x_list.append(0 for i in range(21))
-            y_list.append(0 for i in range(21))
+            x_list += [0 for i in range(21)]
+            y_list += [0 for i in range(21)]
 
         final = np.array(x_list + y_list)
 

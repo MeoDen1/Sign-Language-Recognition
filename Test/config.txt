@@ -1,6 +1,0 @@
-heads = 4
-d_k = 64
-d_v = 64
-d_ff = 64
-seq_len = 200
-d_model = 128
